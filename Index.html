@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>AnimeNexus — Explore ton univers anime</title>
+<style>
+:root{--p:#7057ee;--ink:#202139;--muted:#77798d;--bg:#f8f8fc;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:#ffffffed;backdrop-filter:blur(14px);border-bottom:1px solid #eee;padding:13px 5%;display:flex;align-items:center;gap:20px;justify-content:space-between}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--p);white-space:nowrap}.logo span{color:var(--ink)}
+nav{display:flex;gap:17px}nav button,.plain{border:0;background:none;color:var(--muted);font-weight:650}
+nav button:hover,nav button.active{color:var(--p)}
+.account{border:0;background:var(--p);color:white;padding:10px 15px;border-radius:12px;font-weight:750;white-space:nowrap}
+main{max-width:1150px;margin:auto;padding:24px 18px 90px}
+.hero{position:relative;overflow:hidden;border-radius:25px;padding:34px 28px;background:linear-gradient(115deg,#eeeaff,#f9e9f5 60%,#e5f2ff);min-height:235px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero h1{font-size:clamp(30px,6vw,49px);line-height:1.08;letter-spacing:-2px;margin:12px 0}.hero p{color:#65677d;max-width:440px;line-height:1.6}.eyebrow{color:var(--p);font-weight:800;font-size:12px;letter-spacing:2px}
+.hero-art{font-size:90px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 12px 10px #7773)}
+@keyframes float{50%{transform:translateY(-9px) rotate(3deg)}}
+.primary{background:var(--p);color:white;border:0;border-radius:12px;padding:12px 17px;font-weight:750}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 0 15px}.section-head h2{font-size:22px;margin:0;letter-spacing:-.5px}.count{font-size:12px;color:var(--muted)}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.search{flex:1;min-width:180px;border:1px solid #e7e6f0;background:white;padding:12px 14px;border-radius:12px;outline-color:var(--p)}
+select{border:1px solid #e7e6f0;background:white;padding:11px;border-radius:12px;color:var(--ink);max-width:100%}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
+.chip{flex-shrink:0;background:white;border:1px solid #e9e7f3;border-radius:30px;padding:8px 14px;color:#66677a}
+.chip.active{background:var(--p);color:white;border-color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:17px}
+.anime{background:var(--card);border:1px solid #efedf5;border-radius:17px;overflow:hidden;transition:transform .2s,box-shadow .2s;min-width:0}
+.anime:hover{transform:translateY(-4px);box-shadow:0 12px 28px #30235c12}
+.poster{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;position:relative;overflow:hidden}
+.poster:before{content:"";position:absolute;width:125px;height:125px;border-radius:50%;background:#ffffff35;top:-45px;right:-35px}
+.poster .emoji{font-size:55px;filter:drop-shadow(0 5px 6px #0002);transition:transform .3s}
+.anime:hover .emoji{transform:scale(1.12) rotate(-4deg)}
+.poster small{color:#fff;font-size:10px;font-weight:850;letter-spacing:2px;text-shadow:0 1px 4px #0005}
+.p1{background:linear-gradient(145deg,#ffae69,#ed597d)}.p2{background:linear-gradient(145deg,#79d5f4,#4264d8)}.p3{background:linear-gradient(145deg,#8c79f5,#db7bbd)}.p4{background:linear-gradient(145deg,#78d6af,#268c91)}.p5{background:linear-gradient(145deg,#f6d36f,#ed865e)}.p6{background:linear-gradient(145deg,#a8b7ce,#515879)}.p7{background:linear-gradient(145deg,#f7a8b8,#a44da6)}.p8{background:linear-gradient(145deg,#94dd87,#e2d56c)}
+.fav{position:absolute;right:8px;top:8px;border:0;border-radius:50%;width:33px;height:33px;background:#ffffffdf;font-size:17px}
+.fav.on{color:#ed4f80}
+.info{padding:11px}.info h3{font-size:14px;line-height:1.35;margin:0 0 7px}.meta{display:flex;justify-content:space-between;gap:5px;color:var(--muted);font-size:11px}.tag{display:inline-block;font-size:10px;background:#f0edff;color:var(--p);padding:4px 7px;border-radius:6px;margin-top:9px}
+.empty{grid-column:1/-1;text-align:center;padding:40px 12px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);padding:30px 12px;border-top:1px solid #eceaf3;font-size:13px}
+.modal-bg{position:fixed;inset:0;background:#18162d70;z-index:20;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-bg.show{display:flex}
+.modal{background:white;border-radius:22px;padding:24px;width:min(420px,100%);max-height:85vh;overflow:auto;animation:appear .2s}
+@keyframes appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal h2{margin-top:0}.close{float:right;border:0;background:#f1eff8;border-radius:9px;padding:6px 10px}
+.modal input{width:100%;padding:12px;border:1px solid #e5e2ef;border-radius:10px;margin:7px 0 14px}
+.detail-poster{font-size:65px;text-align:center;padding:25px;border-radius:14px;margin-bottom:14px}
+.bottom{display:none}
+@media(max-width:850px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}header{padding:12px 4%;gap:8px}nav{gap:9px}.hero-art{font-size:68px}}
+@media(max-width:520px){header{flex-wrap:wrap}.logo{font-size:20px}nav{order:3;width:100%;justify-content:space-around;border-top:1px solid #eee;padding-top:10px}nav button{font-size:12px;padding:3px}.account{padding:9px 11px;font-size:12px}main{padding:17px 12px 85px}.hero{padding:24px 18px;min-height:210px;border-radius:20px}.hero-art{font-size:55px}.hero h1{font-size:32px}.hero p{font-size:13px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.info{padding:9px}.info h3{font-size:13px}.poster .emoji{font-size:50px}.section-head h2{font-size:20px}.bottom{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}.bottom button{border:0;background:none;color:#77758a;font-size:11px;display:grid;gap:3px;justify-items:center}.bottom b{font-size:19px}.bottom button.active{color:var(--p)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Anime<span>Nexus</span> ✦</div>
+  <nav>
+    <button class="active" data-page="all">Découvrir</button>
+    <button data-page="popular">Populaires</button>
+    <button data-page="favorites">Favoris ♥</button>
+  </nav>
+  <button class="account" id="profileBtn">👤 Connexion</button>
+</header>
+<main>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">TON PROCHAIN ANIME T'ATTEND</div>
+      <h1>Entre dans<br>un autre monde.</h1>
+      <p>Explore des univers incroyables, découvre tes prochains coups de cœur et construis ta collection.</p>
+      <button class="primary" onclick="document.getElementById('library').scrollIntoView({behavior:'smooth'})">Explorer les animés ↗</button>
+    </div>
+    <div class="hero-art" aria-hidden="true">⛩️</div>
+  </section>
+  <div class="section-head" id="library">
+    <h2 id="listTitle">✨ À découvrir</h2><span class="count" id="count"></span>
+  </div>
+  <div class="controls">
+    <input class="search" id="search" placeholder="🔎 Rechercher un anime..." aria-label="Rechercher un anime">
+    <select id="sort" aria-label="Trier">
+      <option value="popular">Mieux notés</option><option value="az">A à Z</option><option value="new">Année récente</option>
+    </select>
+  </div>
+  <div class="chips" id="genres">
+    <button class="chip active" data-genre="Tous">Tous</button>
+    <button class="chip" data-genre="Action">⚔️ Action</button>
+    <button class="chip" data-genre="Aventure">🌍 Aventure</button>
+    <button class="chip" data-genre="Fantasy">✨ Fantasy</button>
+    <button class="chip" data-genre="Sport">🏀 Sport</button>
+    <button class="chip" data-genre="Romance">💗 Romance</button>
+    <button class="chip" data-genre="Comédie">😂 Comédie</button>
+    <button class="chip" data-genre="Mystère">🔍 Mystère</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>✦ AnimeNexus — Ton univers anime, sans limites.<br><br>Site de découverte créé par des fans. Les titres et personnages appartiennent à leurs ayants droit.</footer>
+<div class="bottom">
+  <button class="active" data-page="all"><b>⌂</b>Découvrir</button>
+  <button data-page="popular"><b>🔥</b>Populaires</button>
+  <button data-page="favorites"><b>♥</b>Favoris</button>
+  <button id="mobileProfile"><b>☺</b>Profil</button>
+</div>
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modal"><button class="close" onclick="closeModal()">✕</button><div id="modalContent"></div></div>
+</div>
+<script>
+const animeList=[
+["One Piece","Aventure","1999","9.0","🏴‍☠️","p1","Action, Aventure et rêves de pirates."],
+["Naruto Shippuden","Action","2007","8.7","🍥","p5","Un ninja poursuit son rêve de devenir Hokage."],
+["Attack on Titan","Action","2013","9.1","🪽","p6","L'humanité lutte pour sa survie derrière des murs."],
+["Demon Slayer","Action","2019","8.6","⚔️","p7","Un jeune pourfendeur affronte des démons."],
+["Jujutsu Kaisen","Action","2020","8.6","👊","p3","Des exorcistes combattent des fléaux."],
+["Dragon Ball Z","Action","1989","8.8","🐉","p5","Des guerriers protègent la Terre."],
+["My Hero Academia","Action","2016","8.2","🦸","p2","Un garçon sans pouvoir rêve de devenir héros."],
+["Solo Leveling","Fantasy","2024","8.7","🌑","p6","Un chasseur découvre un mystérieux système de progression."],
+["Black Clover","Fantasy","2017","8.2","🍀","p4","Asta rêve de devenir Empereur-Mage."],
+["Hunter x Hunter","Aventure","2011","9.0","🎣","p2","Gon part retrouver son père et devenir Hunter."],
+["Fullmetal Alchemist: Brotherhood","Aventure","2009","9.1","⚗️","p4","Deux frères cherchent à retrouver ce qu'ils ont perdu."],
+["Death Note","Mystère","2006","8.9","📓","p6","Un cahier mystérieux bouleverse la justice."],
+["Tokyo Revengers","Action","2021","7.8","⏳","p7","Un voyage dans le temps pour changer le destin."],
+["Bleach","Action","2004","8.2","🗡️","p3","Un lycéen devient faucheur d'âmes."],
+["Chainsaw Man","Action","2022","8.4","🪚","p1","Un jeune homme fusionne avec un démon-tronçonneuse."],
+["Spy x Family","Comédie","2022","8.4","🕵️","p4","Une famille improbable cache plusieurs secrets."],
+["Frieren","Fantasy","2023","9.3","🪄","p2","Une elfe découvre la valeur du temps après l'aventure."],
+["One Punch Man","Comédie","2015","8.5","👊","p5","Un héros gagne tous ses combats d'un seul coup."],
+["Mob Psycho 100","Comédie","2016","8.5","🌪️","p3","Un collégien aux pouvoirs psychiques apprend à grandir."],
+["Haikyuu!!","Sport","2014","8.7","🏐","p5","Une équipe de volley vise les sommets."],
+["Blue Lock","Sport","2022","8.1","⚽","p2","Des attaquants rivalisent pour devenir le meilleur buteur."],
+["Kuroko's Basketball","Sport","2012","8.1","🏀","p4","Une équipe de basket vise le championnat."],
+["Your Lie in April","Romance","2014","8.5","🎹","p7","La musique transforme la vie d'un jeune pianiste."],
+["Horimiya","Romance","2021","8.2","💗","p1","Deux lycéens découvrent leurs facettes cachées."],
+["Fruits Basket","Romance","2019","8.1","🌸","p7","Une rencontre révèle un secret familial."],
+["Kaguya-sama: Love Is War","Comédie","2019","8.4","💌","p8","Deux élèves rivalisent pour se faire avouer leurs sentiments."],
+["Dr. Stone","Aventure","2019","8.1","🧪","p4","La science aide à reconstruire la civilisation."],
+["The Promised Neverland","Mystère","2019","8.3","🔑","p6","Des enfants découvrent la vérité sur leur orphelinat."],
+["Vinland Saga","Aventure","2019","8.8","🛡️","p5","Un jeune guerrier cherche sa voie dans un monde brutal."],
+["Code Geass","Mystère","2006","8.7","♟️","p3","Un pouvoir secret bouleverse un empire."],
+["Fairy Tail","Fantasy","2009","8.0","🔥","p1","Une guilde de mages vit de grandes aventures."],
+["The Apothecary Diaries","Mystère","2023","8.8","🌿","p4","Une jeune apothicaire résout des mystères au palais."],
+["Re:Zero","Fantasy","2016","8.1","⌛","p3","Un voyageur découvre un étrange pouvoir lié au temps."],
+["Mashle","Comédie","2023","7.8","💪","p8","Un garçon sans magie compte sur sa force."],
+["Dandadan","Action","2024","8.5","👽","p2","Deux adolescents rencontrent aliens et phénomènes surnaturels."],
+["The Disastrous Life of Saiki K.","Comédie","2016","8.4","🔮","p8","Un adolescent aux pouvoirs incroyables veut rester discret."],
+["Sword Art Online","Fantasy","2012","7.5","🎮","p3","Des joueurs sont piégés dans un monde virtuel."],
+["Erased","Mystère","2016","8.5","🕰️","p6","Un jeune homme tente de prévenir une tragédie."],
+["Toradora!","Romance","2008","8.0","🐯","p7","Deux lycéens s'entraident pour conquérir leurs amours."],
+["The Seven Deadly Sins","Fantasy","2014","7.7","⚔️","p1"],
+["Fire Force","Action","2019","7.7","🔥","p1"],
+["Soul Eater","Action","2008","8.0","☠️","p3"],
+["Bungo Stray Dogs","Mystère","2016","7.8","🐯","p6"],
+["Hajime no Ippo","Sport","2000","8.8","🥊","p5"],
+["Initial D","Sport","1998","8.4","🏎️","p2"],
+["Komi Can't Communicate","Comédie","2021","7.8","💬","p7"],
+["The Angel Next Door Spoils Me Rotten","Romance","2023","7.8","💝","p7"],
+["Made in Abyss","Aventure","2017","8.3","🧭","p4"],
+["Mushoku Tensei","Fantasy","2021","8.2","✨","p3"],
+["Delicious in Dungeon","Fantasy","2024","8.0","🍲","p5"],
+["Cyberpunk: Edgerunners","Action","2022","8.3","🌃","p6"],
+["Pluto","Mystère","2023","8.2","🤖","p2"],
+["Assassination Classroom","Comédie","2015","8.1","🎓","p8"],
+["Classroom of the Elite","Mystère","2017","7.7","🏫","p6"],
+["The Rising of the Shield Hero","Fantasy","2019","7.8","🛡️","p3"],
+["Terror in Resonance","Mystère","2014","8.1","🎭","p6"],
+["Great Teacher Onizuka","Comédie","1999","8.7","🏍️","p5"],
+["Nana","Romance","2006","8.5","🎤","p7"],
+["Slam Dunk","Sport","1993","8.6","🏀","p1"],
+["Run with the Wind","Sport","2018","8.4","🏃","p4"],
+["Overlord","Fantasy","2015","7.9","💀","p6"],
+["Noragami","Action","2014","8.0","⛩️","p3"],
+["Fate/Zero","Action","2011","8.3","✨","p5"],
+["Psycho-Pass","Mystère","2012","8.2","🔍","p6"],
+["Soul Land","Fantasy","2018","7.9","🐲","p4"],
+["The King's Avatar","Action","2017","8.0","🎮","p2"],
+["Ranking of Kings","Aventure","2021","8.5","👑","p8"],
+["86 Eighty-Six","Action","2021","8.2","🤖","p6"],
+["KonoSuba","Comédie","2016","8.1","💥","p3"],
+["The Quintessential Quintuplets","Romance","2019","7.7","🌸","p7"],
+["Rurouni Kenshin","Action","1996","8.2","🗡️","p5"],
+["Trigun","Aventure","1998","8.2","🔫","p2"],
+["Parasyte","Mystère","2014","8.3","👁️","p6"],
+["Beastars","Mystère","2019","7.8","🐺","p4"],
+["A Silent Voice","Romance","2016","8.9","🎐","p7"],
+["Weathering with You","Romance","2019","8.2","🌧️","p2"],
+["Spirited Away","Aventure","2001","8.9","🐉","p4"],
+["Princess Mononoke","Aventure","1997","8.7","🐺","p5"],
+["Akira","Action","1988","8.0","🏍️","p1"],
+["The Garden of Words","Romance","2013","7.5","🌧️","p4"],
+["Detective Conan","Mystère","1996","8.2","🔎","p2"],
+["Lupin III","Aventure","1971","7.9","🎩","p5"],
+["Inuyasha","Fantasy","2000","7.9","🌙","p3"],
+["Yona of the Dawn","Aventure","2014","8.0","🏹","p1"],
+["K-On!","Comédie","2009","7.8","🎸","p7"],
+["Bocchi the Rock!","Comédie","2022","8.2","🎸","p7"],
+["Sk8 the Infinity","Sport","2021","8.0","🛹","p2"],
+["Free!","Sport","2013","7.4","🏊","p4"],
+["Ao Ashi","Sport","2022","8.1","⚽","p2"],
+["Yuri on Ice","Sport","2016","7.9","⛸️","p3"],
+["Wotakoi","Romance","2018","7.9","🎮","p7"],
+["Insomniacs After School","Romance","2023","8.0","🌙","p2"],
+["The Tatami Galaxy","Mystère","2010","8.4","🌀","p3"],
+["Odd Taxi","Mystère","2021","8.4","🚕","p6"],
+["Heavenly Delusion","Mystère","2023","8.1","🌌","p6"],
+["Shangri-La Frontier","Aventure","2023","8.0","🎮","p2"],
+["The Eminence in Shadow","Fantasy","2022","7.8","🌑","p6"],
+["Blue Exorcist","Action","2011","7.5","🔥","p1"],
+["Magi: The Labyrinth of Magic","Fantasy","2012","7.9","🧞","p3"],
+["Log Horizon","Fantasy","2013","7.7","🗺️","p4"],
+["Beck","Sport","2004","8.2","🎸","p5"]
+];
+const extraDesc="Une aventure pleine de surprises attend les personnages.";
+let genre="Tous",page="all",favorites=JSON.parse(localStorage.getItem("an_favs")||"[]"),user=localStorage.getItem("an_user")||"";
+const $=id=>document.getElementById(id);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+ let q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
+ let items=animeList.map((a,i)=>({...a,id:i,name:a[0],g:a[1],year:a[2],rating:a[3],emoji:a[4],cls:a[5],desc:a[6]||extraDesc}));
+ if(page==="favorites")items=items.filter(a=>favorites.includes(a.id));
+ if(page==="popular")items=items.filter(a=>+a.rating>=8.5);
+ if(genre!=="Tous")items=items.filter(a=>a.g===genre);
+ items=items.filter(a=>a.name.toLowerCase().includes(q)||a.g.toLowerCase().includes(q));
+ if(sort==="az")items.sort((a,b)=>a.name.localeCompare(b.name));
+ if(sort==="new")items.sort((a,b)=>+b.year-(+a.year));
+ if(sort==="popular")items.sort((a,b)=>+b.rating-(+a.rating));
+ $("listTitle").textContent=page==="favorites"?"♥ Mes favoris":page==="popular"?"🔥 Les mieux notés":"✨ À découvrir";
+ $("count").textContent=items.length+" anime(s)";
+ $("grid").innerHTML=items.length?items.map(a=>`<article class="anime"><div class="poster ${a.cls}"><button class="fav ${favorites.includes(a.id)?"on":""}" aria-label="Ajouter aux favoris" onclick="toggleFav(${a.id})">${favorites.includes(a.id)?"♥":"♡"}</button><span class="emoji">${a.emoji}</span><small>ANIMENEXUS</small></div><div class="info"><h3>${esc(a.name)}</h3><div class="meta"><span>⭐ ${a.rating}</span><span>${a.year}</span></div><span class="tag">${esc(a.g)}</span><button class="plain" style="display:block;margin-top:9px;padding:0;color:var(--p);font-size:12px" onclick="details(${a.id})">Voir la fiche →</button></div></article>`).join(""):'<div class="empty">😿 Aucun anime trouvé.<br>Essaie un autre mot ou filtre.</div>';
+}
+function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];localStorage.setItem("an_favs",JSON.stringify(favorites));render()}
+function details(id){let a=animeList[id];$("modalContent").innerHTML=`<div class="detail-poster ${a[5]}">${a[4]}</div><span class="tag">${esc(a[1])}</span><h2>${esc(a[0])}</h2><p>⭐ ${a[3]} / 10 · ${a[2]}</p><p>${esc(a[6]||extraDesc)}</p><button class="primary" onclick="toggleFav(${id});details(${id})">${favorites.includes(id)?"♥ Retirer des favoris":"♡ Ajouter aux favoris"}</button><p style="font-size:12px;color:var(--muted)">Fiche de découverte. Aucun épisode n'est hébergé sur ce site.</p>`;openModal()}
+function openModal(){$("modalBg").classList.add("show")}
+function closeModal(){$("modalBg").classList.remove("show")}
+function profile(){if(user){$("modalContent").innerHTML=`<h2>👋 Salut ${esc(user)} !</h2><p>Ton espace AnimeNexus</p><p>♥ ${favorites.length} favori(s) sauvegardé(s) sur cet appareil.</p><button class="primary" onclick="logout()">Se déconnecter</button>`}else{$("modalContent").innerHTML=`<h2>👤 Rejoins AnimeNexus</h2><p>Crée ton profil local pour personnaliser ton expérience.</p><label for="username">Ton pseudo</label><input id="username" maxlength="24" placeholder="Ex. AnimeFan24"><button class="primary" onclick="login()">Continuer</button><p style="font-size:12px;color:var(--muted)">Démo locale uniquement : aucun compte réel ni mot de passe n'est créé. Ton pseudo reste sur cet appareil.</p>`}openModal()}
+function login(){let name=$("username").value.trim();if(!name){$("username").focus();return}user=name;localStorage.setItem("an_user",user);closeModal();updateProfile()}
+function logout(){user="";localStorage.removeItem("an_user");closeModal();updateProfile()}
+function updateProfile(){$("profileBtn").textContent=user?"👤 "+user:"👤 Connexion"}
+document.querySelectorAll("[da
